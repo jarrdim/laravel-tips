@@ -173,3 +173,114 @@ performance after adding helper functions or service classes:
 
             php artisan optimize
 
+
+
+
+##############################
+CustomService.php CODE
+#############################
+
+
+    <?php
+
+    namespace App\Services;
+    
+    
+    use Illuminate\Support\Facades\DB;
+    use Illuminate\Support\Facades\Auth;
+    
+    class CustomService
+    {
+    public function user_can($permission)
+    {
+        // Add your logic here to check the user's permission
+        // and return true or false accordingly
+    
+        // Example logic:
+
+       // $permissions = config('constants.PERMISSIONS');
+
+            echo "<pre>";
+            echo $permission;
+
+           $permissions = strtolower($permission);
+            $role = $this->getUserData();
+           $role =  $role['role_id'];
+        
+          $myroles = $this->getPermissionsByRoleName($role);
+
+        if($myroles)
+        {
+            
+          $myroles = array_column($myroles, 'name');
+
+
+          print_r($myroles);
+ 
+        }
+        else
+        {
+            $myroles = [];
+        }
+
+        
+        if(in_array( $permission, $myroles))
+
+        {
+           return true;
+        }
+       return false;
+
+    }
+    public function getPermissionsByRoleName($roleName)
+    {
+        
+       // echo $roleName;
+        //return  $roleName;
+        
+       // SELECT permissions.name FROM permissions INNER JOIN roles ON permissions.role_id = roles.id WHERE permissions.disabled = 1 and roles.name = 'user'; 
+        $permissions = DB::select("
+            SELECT permissions.name
+            FROM permissions
+            INNER JOIN roles ON permissions.role_id = roles.id
+            WHERE permissions.disabled = 1
+            AND roles.name = :roleName
+        ", ['roleName' => $roleName]);
+    
+
+        return $permissions;
+        
+    }
+    
+    public function getUserData()
+    {
+        if (Auth::check()) {
+            // User is authenticated, retrieve user data
+            $user = Auth::user();
+            
+            // Access user data
+           // $userId = $user->id;
+            //$userName = $user->name;
+            //$userEmail = $user->email;
+            $roleId = $user->role_id;
+            
+            // Perform any operations with user data
+            
+            // Return or use the user data as needed
+            return [
+                //'id' => $userId,
+                //'name' => $userName,
+                //'email' => $userEmail,
+                'role_id'=>$roleId,
+            ];
+        }
+        
+        // User is not authenticated, handle accordingly
+        return null;
+    }
+}
+
+
+
+
+
