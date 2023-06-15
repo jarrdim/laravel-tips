@@ -238,7 +238,8 @@ CustomService.php CODE
        // echo $roleName;
         //return  $roleName;
         
-       // SELECT permissions.name FROM permissions INNER JOIN roles ON permissions.role_id = roles.id WHERE permissions.disabled = 1 and roles.name = 'user'; 
+       // SELECT permissions.name FROM permissions INNER JOIN roles 
+       //ON permissions.role_id = roles.id WHERE permissions.disabled = 1 and roles.name = 'user'; 
         $permissions = DB::select("
             SELECT permissions.name
             FROM permissions
@@ -282,5 +283,99 @@ CustomService.php CODE
 
 
 
+
+
+
+########################
+
+IF WANT TO USE THESE
+
+########################
+
+        @if (Auth::user_can('edit'))
+            <p>User can edit.</p>
+        @else
+            <p>User cannot edit.</p>
+        @endif
+
+
+
+THEN
+
+Create a new file called CustomServiceFacade.php in the app/Facades directory 
+
+(if the directory doesn't exist, create it).
+
+Inside CustomServiceFacade.php, define the facade class like this:
+
+
+
+                    <?php
+                        
+                        namespace App\Facades;
+                        
+                        use Illuminate\Support\Facades\Facade;
+                        
+                        class CustomServiceFacade extends Facade
+                        {
+                            protected static function getFacadeAccessor()
+                            {
+                                return 'custom';
+                            }
+                        }
+
+
+
+To be able to access the user_can() method directly as Auth::user_can('edit'), 
+
+you can create a custom facade in Laravel. Here's an example of how you can achieve this:
+
+Create a new file called CustomServiceFacade.php in the app/Facades directory 
+
+(if the directory doesn't exist, create it).
+
+Inside CustomServiceFacade.php, define the facade class like this:
+
+                            
+                            <?php
+                            
+                            namespace App\Facades;
+                            
+                            use Illuminate\Support\Facades\Facade;
+                            
+                            class CustomServiceFacade extends Facade
+                            {
+                                protected static function getFacadeAccessor()
+                                {
+                                    return 'custom';
+                                }
+                            }
+                            
+                            
+
+
+Register the facade in the config/app.php file by adding the following entry in the aliases array:
+
+        'CustomService' => App\Facades\CustomServiceFacade::class,
+
+
+Update your CustomService class to use the facade instead of the app('custom')
+
+syntax. Replace app('custom') with CustomService::class or
+
+CustomServiceFacade::class wherever you're using it.
+
+Run the following command to clear the Laravel application cache:
+
+
+
+                    php artisan optimize:clear
+
+                    
+Now, you can access the user_can() method directly as
+
+Auth::user_can('edit'). 
+
+Make sure to include the use statement at the top of your file:
 
 
